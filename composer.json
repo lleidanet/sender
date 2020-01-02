@@ -1,0 +1,37 @@
+{
+    "name": "lnst/sender",
+    "version": "4.0.0",
+    "homepage": "https://api.lleida.net/",
+    "description": "Lleida.net resources",
+    "type": "library",
+    "keywords": [
+        "lleidanet",
+        "sms",
+        "mms",
+        "send",
+        "messages",
+        "registered",
+        "lnst"
+    ],
+    "autoload": {
+        "psr-4": {
+            "lnst\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^5.6 || ^7.0",
+        "ext-openssl": "*",
+        "ext-mbstring": "*",
+        "psr/log": "1.0"
+    },
+    "authors": [
+        {
+            "name": "David Tapia",
+            "email": "dtapia@lleida.net",
+            "homepage": "https://www.lleida.net/"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^8.4"
+    }
+}
