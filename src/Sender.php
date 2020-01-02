@@ -178,7 +178,7 @@ class Sender
     public function getStatusDescription($status)
     {
         if (!array_key_exists($status, self::$statuses)) {
-            throw new InvalidArgumentException("Undefined status value: ". $status);
+            throw new \InvalidArgumentException("Undefined status value: ". $status);
         }
         return self::$statuses[$status]['description'];
     }
@@ -186,7 +186,7 @@ class Sender
     public function getStatusCode($status)
     {
         if (!array_key_exists($status, self::$statuses)) {
-            throw new InvalidArgumentException("Undefined status value: ". $status);
+            throw new \InvalidArgumentException("Undefined status value: ". $status);
         }
         return self::$statuses[$status]['code'];
     }
@@ -441,16 +441,16 @@ class Sender
                 throw new \InvalidArgumentException("Invalid attachment format, unknown mimetype!");
             } else {
                 // Supported MMS content types MMS may include the following content formats:
-                switch (true) {
-                    case $attachment['mime'] === "image/gif":
-                    case $attachment['mime'] === "image/png":
-                    case $attachment['mime'] === "image/jpeg":
-                    case $attachment['mime'] === "audio/amr":
-                    case $attachment['mime'] === "audio/x-wav":
-                    case $attachment['mime'] === "audio/mpeg":
-                    case $attachment['mime'] === "audio/midi":
-                    case $attachment['mime'] === "video/3gpp":
-                    case $attachment['mime'] === "video/mpeg":
+                switch ($attachment['mime']) {
+                    case "image/gif":
+                    case "image/png":
+                    case "image/jpeg":
+                    case "audio/amr":
+                    case "audio/x-wav":
+                    case "audio/mpeg":
+                    case "audio/midi":
+                    case "video/3gpp":
+                    case "video/mpeg":
                         break;
                     default:
                         throw new \InvalidArgumentException("Invalid mimetype!");

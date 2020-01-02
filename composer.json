@@ -29,6 +29,10 @@
             "name": "David Tapia",
             "email": "dtapia@lleida.net",
             "homepage": "https://www.lleida.net/"
+        },{
+            "name": "Javier Sanahuja",
+            "email": "jsanahuja@lleida.net",
+            "homepage": "https://www.lleida.net/"
         }
     ],
     "require-dev": {
