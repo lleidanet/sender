@@ -4,7 +4,7 @@
  * API PHP v4
  * @author David Tapia (c) 2018 - Lleida.net
  * @version 4.0
- * 
+ *
  */
 
 namespace lnst;
@@ -64,10 +64,10 @@ class Sender
     // $sender = new Sender($user, $pass);
     public function __construct($user, $password, $lang = 'EN')
     {
-        if(empty($user)){
+        if (empty($user)) {
             throw new \InvalidArgumentException("Empty user!");
         }
-        if(empty($user)){
+        if (empty($user)) {
             throw new \InvalidArgumentException("Empty password!");
         }
         
@@ -197,18 +197,19 @@ class Sender
         $this->lang = $this->check_lang($lang);
     }
 
-    public function getLang(){
+    public function getLang()
+    {
         return $this->lang;
     }
 
     // $filename with path
     public function setLogger($logger)
     {
-        if($logger instanceof LoggerInterface){
+        if ($logger instanceof LoggerInterface) {
             $this->logger = $logger;
-        }else{
+        } else {
             $this->logger = new Logger($logger);
-        }    
+        }
     }
 
     // Attachment content must be encoded in base64
@@ -488,7 +489,7 @@ class Sender
     // T -> Registered Contract
     protected function check_registered_type($type)
     {
-        $ut = strtoupper($type);
+        $ul = strtoupper($type);
         if (in_array($ul, self::$registered_types)) {
             return $ul;
         }
@@ -541,7 +542,7 @@ class Sender
 
             $schedule = $schedule . $utc;
         } else {
-            throw new \InvalidArgumentException("Empty schedule option!");
+            throw new \InvalidArgumentException("Invalid schedule format");
         }
 
         return $schedule;
@@ -672,7 +673,7 @@ class Sender
     protected function response_parser($response)
     {
         $result = @json_decode($response);
-        if(json_last_error() !== JSON_ERROR_NONE || is_null($result)){
+        if (json_last_error() !== JSON_ERROR_NONE || is_null($result)) {
             throw new \Exception("Invalid JSON response. Error:". json_last_error() .":". json_last_error_msg());
         }
         $this->logger->debug('response_parser type: '. $result->request .' code: '. $result->code ."\n");
@@ -695,7 +696,7 @@ class Sender
     {
         $state = 'U'; // Default status: Unknown
         $result = @json_decode($response);
-        if(json_last_error() !== JSON_ERROR_NONE || is_null($result)){
+        if (json_last_error() !== JSON_ERROR_NONE || is_null($result)) {
             throw new \Exception("Invalid JSON response. Error:". json_last_error() .":". json_last_error_msg());
         }
 

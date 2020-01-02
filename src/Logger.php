@@ -4,7 +4,7 @@
  * API PHP v4
  * @author David Tapia (c) 2018 - Lleida.net
  * @version 4.0
- * 
+ *
  */
 namespace lnst;
 
@@ -91,10 +91,11 @@ class Logger extends AbstractLogger
         }
     }
 
-    private function getuser(){
+    private function getuser()
+    {
         if (function_exists('posix_getpwuid') && function_exists('posix_geteuid')) {
             $pwuid = posix_getpwuid(posix_geteuid());
-            if(isset($pwuid['name'])){
+            if (isset($pwuid['name'])) {
                 return $pwuid["name"];
             }
         }
