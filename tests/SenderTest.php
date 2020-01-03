@@ -136,15 +136,17 @@ class SenderTest extends TestCase
             );
         }
 
-        try{
+        try {
             $this->instance->getStatusCode("invalidStatusKey");
             $this->fail("Invalid status: No exception thrown");
-        }catch(\Exception $e){}
+        } catch (\Exception $e) {
+        }
 
-        try{
+        try {
             $this->instance->getStatusDescription("invalidStatusKey");
             $this->fail("Invalid status: No exception thrown");
-        }catch(\Exception $e){}
+        } catch (\Exception $e) {
+        }
     }
 
     /** @test **/
@@ -171,13 +173,13 @@ class SenderTest extends TestCase
     /** @test */
     public function test_make_json_mt()
     {
-        // @ TODO
+        $this->markTestIncomplete();
     }
 
     /** @test */
     public function test_make_json_mmt()
     {
-        // @ TODO
+        $this->markTestIncomplete();
     }
 
     /** @test **/
@@ -250,7 +252,7 @@ class SenderTest extends TestCase
             array("delivery_receipt" => array(
                 "lang" => $this->instance->getLang(),
                 "email" => "INTERNALID"
-            )),
+            ))
         );
 
         // Invalid email
@@ -265,11 +267,11 @@ class SenderTest extends TestCase
             array("delivery_receipt" => array(
                 "lang" => $this->instance->getLang(),
                 "email" => "INTERNALID"
-            )),
+            ))
         );
 
         // Invalid lang
-        try{
+        try {
             $options = array(
                 "delivery_receipt" => array(
                     "lang" => "invalidLang"
@@ -277,10 +279,11 @@ class SenderTest extends TestCase
             );
             $this->instance->public_check_options($options);
             $this->fail("Invalid lang: No exception thrown");
-        }catch(\Exception $e){}
+        } catch (\Exception $e) {
+        }
 
         // Invalid cert_type
-        try{
+        try {
             $options = array(
                 "delivery_receipt" => array(
                     "cert_type" => "invalidCertType"
@@ -288,7 +291,8 @@ class SenderTest extends TestCase
             );
             $this->instance->public_check_options($options);
             $this->fail("Invalid cert_type: No exception thrown");
-        }catch(\Exception $e){}
+        } catch (\Exception $e) {
+        }
 
         // Valid data
         $lang = Sender::$languages[rand(0, sizeof(Sender::$languages)-1)];
@@ -307,7 +311,7 @@ class SenderTest extends TestCase
                 "lang" => $lang,
                 "email" => "test@domain.com",
                 "cert_type" => $cert_type
-            )),
+            ))
         );
 
         $this->assertTrue(true);
@@ -325,45 +329,58 @@ class SenderTest extends TestCase
     public function test_check_attachment()
     {
         // No attachment
-        try{
+        try {
             $this->instance->public_check_attachment(1);
             $this->fail("Invalid attachment: No exception thrown");
-        }catch(\Exception $e){}
+        } catch (\Exception $e) {
+        }
 
         // Missing keys
-        try{
+        try {
             $this->instance->public_check_attachment(array());
             $this->fail("Invalid attachment: No exception thrown");
-        }catch(\Exception $e){}
+        } catch (\Exception $e) {
+        }
 
-        try{
+        try {
             $this->instance->public_check_attachment(array("mime" => "image/jpeg"));
             $this->fail("Invalid attachment: No exception thrown");
-        }catch(\Exception $e){}
+        } catch (\Exception $e) {
+        }
 
-        try{
+        try {
             $this->instance->public_check_attachment(array("content" => ""));
             $this->fail("Invalid attachment: No exception thrown");
-        }catch(\Exception $e){}
+        } catch (\Exception $e) {
+        }
 
         // Invalid contents
-        try{
+        try {
             $this->instance->public_check_attachment(array("mime" => "", "content" => ""));
             $this->fail("Invalid attachment: No exception thrown");
-        }catch(\Exception $e){}
+        } catch (\Exception $e) {
+        }
 
-        try{
+        try {
             $this->instance->public_check_attachment(array("mime" => "image/png", "content" => ""));
             $this->fail("Invalid attachment: No exception thrown");
-        }catch(\Exception $e){}
+        } catch (\Exception $e) {
+        }
 
         // Valid: Not expecting exception
-        $this->instance->public_check_attachment(
-            array(
-                "mime" => "image/png",
-                "content" => self::$b64img
-            )
-        );
+        try {
+            $this->instance->public_check_attachment(
+                array(
+                    "mime" => "image/png",
+                    "content" => self::$b64img
+                )
+            );
+            // No exception thrown
+            $this->assertTrue(true);
+        } catch (\Exception $e) {
+            // Unexpected exception
+            $this->fail("Exception on valid attachment", $e->getMessage());
+        }
     }
     
     /** @test */
@@ -380,10 +397,11 @@ class SenderTest extends TestCase
             );
             
             if (!in_array($rtype."-", Sender::$languages)) {
-                try{
+                try {
                     $this->instance->public_check_registered_type($rtype."-");
                     $this->fail("Invalid cert_type: No exception thrown");
-                }catch(\Exception $e){}
+                } catch (\Exception $e) {
+                }
             }
         }
     }
@@ -402,10 +420,11 @@ class SenderTest extends TestCase
             );
             
             if (!in_array(strrev($lang), Sender::$languages)) {
-                try{
+                try {
                     $this->instance->public_check_lang(strrev($lang));
                     $this->fail("Invalid lang: No exception thrown");
-                }catch(\Exception $e){}
+                } catch (\Exception $e) {
+                }
             }
         }
     }
