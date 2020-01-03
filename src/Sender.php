@@ -67,7 +67,7 @@ class Sender
         if (empty($user)) {
             throw new \InvalidArgumentException("Empty user!");
         }
-        if (empty($user)) {
+        if (empty($password)) {
             throw new \InvalidArgumentException("Empty password!");
         }
         
@@ -454,7 +454,6 @@ class Sender
                         break;
                     default:
                         throw new \InvalidArgumentException("Invalid mimetype!");
-                        break;
                 }
             }
 
@@ -710,6 +709,9 @@ class Sender
             ) {
                 $state = $result->messages[0]->state;
             }
+            $this->set_error(false);
+        }else{
+            $this->set_error($result->status, $result->code);
         }
 
         $this->logger->debug('id: '.$id.' type: '.$request.' state: '.$state."\n");

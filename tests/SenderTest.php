@@ -13,10 +13,28 @@ use PHPUnit\Framework\TestCase;
 use lnst\Sender;
 
 /**
- * Class to access protected methods.
+ * Class to access protected methods and override 
+ * not reproducible behaviors
  */
 class SenderExt extends Sender
 {
+    /**
+     * Customizing do_request response
+     */
+    private $response;
+
+    private function set_response($response){
+        $this->response = $response;
+    }
+
+    protected function do_request($service, $json)
+    {
+        return $this->response;
+    }
+
+    /**
+     * Access to protected methods
+     */
     public function public_make_json_mt($id, $dst, $text, $options = array())
     {
         return $this->make_json_mt($id, $dst, $text, $options);
@@ -96,6 +114,14 @@ class SenderExt extends Sender
     {
         return $this->toBool($var);
     }
+
+    public function public_response_parser($response){
+        return $this->response_parser($response);
+    }
+
+    public function public_response_parser_status($request, $id, $response){
+        return $this->response_parser_status($request, $id, $response);
+    }
 }
 
 /**
@@ -120,6 +146,24 @@ class SenderTest extends TestCase
     protected function setUp()
     {
         $this->instance = new SenderExt(self::$username, self::$password);
+        $this->instance->setLogger("tests.log");
+    }
+
+    /** @test **/
+    public function test_constructor()
+    {
+        
+        try {
+            new SenderExt("", self::$password);
+            $this->fail("Empty username: No exception thrown");
+        } catch (\Exception $e) {
+        }
+        
+        try {
+            new SenderExt(self::$username, "");
+            $this->fail("Empty password: No exception thrown");
+        } catch (\Exception $e) {
+        }
     }
 
     /** @test **/
@@ -162,6 +206,12 @@ class SenderTest extends TestCase
                 $this->instance->getFileContentBase64(self::$img)
             )
         );
+        $this->assertFalse(
+            $this->instance->public_isBase64Encoded("Not base64")
+        );
+        $this->assertFalse(
+            $this->instance->public_isBase64Encoded("Neither a base64 encoded string")
+        );
         $this->assertTrue(
             $this->instance->public_isBase64Encoded(self::$b64img)
         );
@@ -173,13 +223,150 @@ class SenderTest extends TestCase
     /** @test */
     public function test_make_json_mt()
     {
-        $this->markTestIncomplete();
+        $id = time();
+        $dst = array("+34666666666");
+        $txt = "Test message";
+        
+        $options = array(
+            "delivery_receipt" => array(
+                "lang" => "EN",
+                "email" => "test@domain.com",
+                "cert_type" => "D"
+            )
+        );
+        $options_src = array(
+            "src" => "Sender",
+            "delivery_receipt" => array(
+                "lang" => "EN",
+                "email" => "test@domain.com",
+                "cert_type" => "D"
+            )
+        );
+        $options_unicode = array(
+            "unicode" => true,
+            "delivery_receipt" => array(
+                "lang" => "EN",
+                "email" => "test@domain.com",
+                "cert_type" => "D"
+            )
+        );
+
+        $options_schedule = array(
+            // within 5 minutes
+            "schedule" => date('YmdHi', time() + 60*5),
+            "unicode" => true,
+            "delivery_receipt" => array(
+                "lang" => "EN",
+                "email" => "test@domain.com",
+                "cert_type" => "D"
+            )
+        );
+
+        // Invalid params
+        try {
+            $this->instance->public_make_json_mt("", "", "", array());
+            $this->fail("Empty parameter: No exception thrown");
+        } catch (\Exception $e) {}
+        try {
+            $this->instance->public_make_json_mt($id, "", "", array());
+            $this->fail("Empty parameter: No exception thrown");
+        } catch (\Exception $e) {}
+        try {
+            $this->instance->public_make_json_mt($id, $dst, "", array());
+            $this->fail("Empty parameter: No exception thrown");
+        } catch (\Exception $e) {}
+
+        $this->assertEquals(
+            $this->instance->public_make_json_mt($id, $dst, $txt),
+            '{"sms":{"user":"username","password":"password","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"VGVzdCBtZXNzYWdl","encoding":"base64","charset":"iso-8859-1"}}'
+        );
+        
+        $this->assertEquals(
+            $this->instance->public_make_json_mt($id, $dst, $txt, $options),
+            '{"sms":{"delivery_receipt":{"lang":"EN","email":"test@domain.com","cert_type":"D"},"allow_answer":"1","user":"username","password":"password","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"VGVzdCBtZXNzYWdl","encoding":"base64","charset":"iso-8859-1"}}'
+        );
+        
+        $this->assertEquals(
+            $this->instance->public_make_json_mt($id, $dst, $txt, $options_src),
+            '{"sms":{"src":"Sender","delivery_receipt":{"lang":"EN","email":"test@domain.com","cert_type":"D"},"user":"username","password":"password","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"VGVzdCBtZXNzYWdl","encoding":"base64","charset":"iso-8859-1"}}'
+        );
+        
+        $this->assertEquals(
+            $this->instance->public_make_json_mt($id, $dst, $txt, $options_unicode),
+            '{"sms":{"unicode":true,"delivery_receipt":{"lang":"EN","email":"test@domain.com","cert_type":"D"},"allow_answer":"1","user":"username","password":"password","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"AFQAZQBzAHQAIABtAGUAcwBzAGEAZwBl","encoding":"base64","charset":"UTF-16","data_coding":"unicode"}}'
+        );
+        
+
+        $GMTDiff = date("O");
+        if(intval($GMTDiff) >= 0){
+            $expectedSchedule = $options_schedule['schedule'] . str_replace("+", "-", $GMTDiff);
+        }else{
+            $expectedSchedule = $options_schedule['schedule'] . str_replace("-", "+", $GMTDiff);
+        }
+        $this->assertEquals(
+            $this->instance->public_make_json_mt($id, $dst, $txt, $options_schedule),
+            '{"sms":{"schedule":"'. $expectedSchedule .'","unicode":true,"delivery_receipt":{"lang":"EN","email":"test@domain.com","cert_type":"D"},"allow_answer":"1","user":"username","password":"password","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"AFQAZQBzAHQAIABtAGUAcwBzAGEAZwBl","encoding":"base64","charset":"UTF-16","data_coding":"unicode"}}'
+        );
     }
 
     /** @test */
     public function test_make_json_mmt()
     {
-        $this->markTestIncomplete();
+        $id = time();
+        $dst = array("+34666666666");
+        $txt = "Test message";
+        $subject = "Test";
+        $attachment = array(
+            "mime" => "image/png",
+            "content" => "iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAACXBIWXMAAAsTAAALEwEAmpwYAAAKT2lDQ1BQ=="
+        );
+        $options = array(
+            "delivery_receipt" => array(
+                "lang" => "EN",
+                "email" => "test@domain.com",
+                "cert_type" => "D"
+            )
+        );
+
+        // Invalid params
+        try {
+            $this->instance->public_make_json_mmt("", "", "", "", array());
+            $this->fail("Empty parameter: No exception thrown");
+        } catch (\Exception $e) {}
+        try {
+            $this->instance->public_make_json_mmt($id, "", "", "", array());
+            $this->fail("Empty parameter: No exception thrown");
+        } catch (\Exception $e) {}
+        try {
+            $this->instance->public_make_json_mmt($id, $dst, "", "", array());
+            $this->fail("Empty parameter: No exception thrown");
+        } catch (\Exception $e) {}
+        try {
+            $this->instance->public_make_json_mmt($id, $dst, $txt, "", array());
+            $this->fail("Empty parameter: No exception thrown");
+        } catch (\Exception $e) {}
+        try {
+            $this->instance->public_make_json_mmt($id, $dst, $txt, $subject, array());
+            $this->fail("Empty parameter: No exception thrown");
+        } catch (\Exception $e) {}
+        try {
+            $this->instance->public_make_json_mmt($id, $dst, $txt, $subject, "Invalid attachment");
+            $this->fail("Invalid attachment: No exception thrown");
+        } catch (\Exception $e) {}
+        try {
+            $this->instance->public_make_json_mmt($id, $dst, array("Invalid Text"), $subject, $attachment);
+            $this->fail("Invalid text: No exception thrown");
+        } catch (\Exception $e) {}
+        try {
+            $this->instance->public_make_json_mmt($id, $dst, $txt, array("Invalid Subject"), $attachment);
+            $this->fail("Invalid subject: No exception thrown");
+        } catch (\Exception $e) {}
+        
+        // Valid
+        $this->assertEquals(
+            $this->instance->public_make_json_mmt($id, $dst, $txt, $subject, $attachment, $options),
+            '{"mms":{"delivery_receipt":{"lang":"EN","email":"test@domain.com","cert_type":"D"},"txt":"VGVzdCBtZXNzYWdl","encoding":"base64","charset":"iso-8859-1","user":"username","password":"password","user_id":'. $id .',"dst":{"num":["+34666666666"]},"subject":"Test","attachment":{"mime":"image\/png","content":"iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAACXBIWXMAAAsTAAALEwEAmpwYAAAKT2lDQ1BQ=="}}}'
+        );
     }
 
     /** @test **/
@@ -203,7 +390,7 @@ class SenderTest extends TestCase
             )
         );
         $this->assertEquals(
-            $this->instance->public_make_dst(["+34000000000", "+34666666666"]),
+            $this->instance->public_make_dst(array("+34000000000", "+34666666666")),
             array(
                 "num" => array(
                     "+34000000000",
@@ -211,6 +398,14 @@ class SenderTest extends TestCase
                 )
             )
         );
+        
+        // Empty dst
+        try {
+            $this->instance->public_make_dst(array());
+            $this->fail("Empty dst: No exception thrown");
+        } catch (\Exception $e) {
+        }
+
         $this->expectException(\Exception::class);
         $this->instance->public_make_dst(2);
     }
@@ -315,15 +510,6 @@ class SenderTest extends TestCase
         );
 
         $this->assertTrue(true);
-        $this->assertTrue(true);
-        $this->assertTrue(true);
-        $this->assertTrue(true);
-        $this->assertTrue(true);
-        $this->assertTrue(true);
-        $this->assertTrue(true);
-        $this->assertTrue(true);
-        $this->assertTrue(true);
-        $this->assertTrue(true);
     }
     /** @test */
     public function test_check_attachment()
@@ -363,6 +549,13 @@ class SenderTest extends TestCase
 
         try {
             $this->instance->public_check_attachment(array("mime" => "image/png", "content" => ""));
+            $this->fail("Invalid attachment: No exception thrown");
+        } catch (\Exception $e) {
+        }
+
+        // Invalid base64
+        try {
+            $this->instance->public_check_attachment(array("mime" => "image/png", "content" => "notb64"));
             $this->fail("Invalid attachment: No exception thrown");
         } catch (\Exception $e) {
         }
@@ -484,6 +677,27 @@ class SenderTest extends TestCase
                 $test[1]
             );
         }
+        
+        // Invalid "int" formats
+        try {
+            $this->instance->public_check_schedule(time());
+            $this->fail("Invalid schedule: No exception thrown");
+        } catch (\Exception $e) {
+        }
+
+        // Invalid date format
+        try {
+            $this->instance->public_check_schedule(date("Ymdhiss", time()));
+            $this->fail("Invalid schedule: No exception thrown");
+        } catch (\Exception $e) {
+        }
+
+        // Invalid format
+        try {
+            $this->instance->public_check_schedule("Invalid format");
+            $this->fail("Invalid schedule: No exception thrown");
+        } catch (\Exception $e) {
+        }
     }
 
     /** @test */
@@ -497,7 +711,9 @@ class SenderTest extends TestCase
             array("+", false),
             array("00", false),
             array("1", "1"),
-            array("34", "34")
+            array("34", "34"),
+            array(34, "34"),
+            array(1, "1"),
         );
         foreach ($tests as $test) {
             $this->assertEquals(
@@ -563,7 +779,9 @@ class SenderTest extends TestCase
             "email@domain",
             "email@-domain.com",
             "email@111.222.333.44444",
-            "email@domain..com"
+            "email@domain..com",
+            "INTERNAL",
+            "INTERNALID"
         );
         foreach ($valid as $email) {
             $this->assertEquals($this->instance->public_check_email($email), $email);
@@ -585,5 +803,48 @@ class SenderTest extends TestCase
         foreach ($test_false as $test) {
             $this->assertFalse($this->instance->public_toBool($test));
         }
+    }
+
+    /** @test */
+    public function test_response_parser()
+    {
+        $this->assertTrue(
+            $this->instance->public_response_parser('{"status":"Success","code":200,"request":"test"}')
+        );
+        $this->assertFalse($this->instance->error);
+        $this->assertEquals($this->instance->errno, 0);
+
+        
+        $this->assertFalse(
+            $this->instance->public_response_parser('{"status":"Error!","code":1601,"request":"test"}')
+        );
+        $this->assertEquals($this->instance->error, "Error!");
+        $this->assertEquals($this->instance->errno, 1601);
+        
+        // Invalid json
+        $this->expectException(\Exception::class);
+        $this->instance->public_response_parser("Invalid JSON Response");
+    }
+
+    public function test_response_parser_status(){
+
+        $this->assertEquals(
+            $this->instance->public_response_parser_status('mt', 1, '{"status":"Success","code":200,"request":"test","messages":[{"state":"P"}]}'),
+            "P"
+        );
+        $this->assertFalse($this->instance->error);
+        $this->assertEquals($this->instance->errno, 0);
+
+        
+        $this->assertEquals(
+            $this->instance->public_response_parser_status('mmt', 1, '{"status":"Error!","code":1601,"request":"test"}'),
+            "U" // Default state
+        );
+        $this->assertEquals($this->instance->error, "Error!");
+        $this->assertEquals($this->instance->errno, 1601);
+        
+        // Invalid json
+        $this->expectException(\Exception::class);
+        $this->instance->public_response_parser_status('mmt', 1, "Invalid JSON Response");
     }
 }
