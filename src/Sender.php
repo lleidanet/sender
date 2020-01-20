@@ -131,7 +131,7 @@ class Sender
     public function mt($id, $dst, $text, $options = array())
     {
         $json = $this->make_json_mt($id, $dst, $text, $options);
-        $this->logger->debug('json: '.$json."\n");
+        $this->logger->debug('json: '. $this->protect_json($json) ."\n");
         return $this->response_parser($this->do_request(SERVICE_SMS, urlencode($json)));
     }
 
@@ -145,7 +145,7 @@ class Sender
     public function mmt($id, $dst, $text, $subject, $attachment, $options = array())
     {
         $json = $this->make_json_mmt($id, $dst, $text, $subject, $attachment, $options);
-        $this->logger->debug('json: '.$json."\n");
+        $this->logger->debug('json: '. $this->protect_json($json) ."\n");
         return $this->response_parser($this->do_request(SERVICE_MMS, urlencode($json)));
     }
 
@@ -156,14 +156,14 @@ class Sender
     public function getStatusSMS($id)
     {
         $json = $this->make_json_status('mt', $id);
-        $this->logger->debug('json: '.$json."\n");
+        $this->logger->debug('json: '. $this->protect_json($json) ."\n");
         return $this->response_parser_status('mt', $id, $this->do_request(SERVICE_MSG, urlencode($json)));
     }
 
     public function getStatusMMS($id)
     {
         $json = $this->make_json_status('mmt', $id);
-        $this->logger->debug('json: '.$json."\n");
+        $this->logger->debug('json: '. $this->protect_json($json) ."\n");
         return $this->response_parser_status('mmt', $id, $this->do_request(SERVICE_MSG, urlencode($json)));
     }
 
@@ -171,7 +171,7 @@ class Sender
     public function getStatusScheduled($id)
     {
         $json = $this->make_json_status('sched', $id);
-        $this->logger->debug('json: '.$json."\n");
+        $this->logger->debug('json: '. $this->protect_json($json) ."\n");
         return $this->response_parser_status('sched', $id, $this->do_request(SERVICE_MSG, urlencode($json)));
     }
 
@@ -205,11 +205,7 @@ class Sender
     // $filename with path
     public function setLogger($logger)
     {
-        if ($logger instanceof LoggerInterface) {
-            $this->logger = $logger;
-        } else {
-            $this->logger = new Logger($logger);
-        }
+        $this->logger = new Logger($logger);
     }
 
     // Attachment content must be encoded in base64
@@ -655,6 +651,10 @@ class Sender
             default:
                 return false;
         }
+    }
+
+    protected function protect_json($json){
+        return str_replace($this->password, "censored password", $json);
     }
 
     protected function do_request($service, $json)
