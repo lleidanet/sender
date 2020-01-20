@@ -14,25 +14,10 @@ use lnst\Sender;
 use lnst\Logger;
 
 /**
- * Class to access protected methods and override 
- * not reproducible behaviors
+ * Class to access protected methods
  */
 class SenderExt extends Sender
 {
-    /**
-     * Customizing do_request response
-     */
-    private $response;
-
-    private function set_response($response){
-        $this->response = $response;
-    }
-
-    protected function do_request($service, $json)
-    {
-        return $this->response;
-    }
-
     /**
      * Access to protected methods
      */
