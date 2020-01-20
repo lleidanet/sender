@@ -11,6 +11,7 @@ namespace lnst\Tests;
 
 use PHPUnit\Framework\TestCase;
 use lnst\Sender;
+use lnst\Logger;
 
 /**
  * Class to access protected methods and override 
@@ -147,6 +148,7 @@ class SenderTest extends TestCase
     {
         $this->instance = new SenderExt(self::$username, self::$password);
         $this->instance->setLogger("tests.log");
+        $this->instance->setLogger(new Logger("tests.log"));
     }
 
     /** @test **/
