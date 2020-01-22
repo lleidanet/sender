@@ -101,11 +101,13 @@ class SenderExt extends Sender
         return $this->toBool($var);
     }
 
-    public function public_response_parser($response){
+    public function public_response_parser($response)
+    {
         return $this->response_parser($response);
     }
 
-    public function public_response_parser_status($request, $id, $response){
+    public function public_response_parser_status($request, $id, $response)
+    {
         return $this->response_parser_status($request, $id, $response);
     }
 }
@@ -138,7 +140,6 @@ class SenderTest extends TestCase
     /** @test **/
     public function test_constructor()
     {
-        
         try {
             new SenderExt("", self::$password);
             $this->fail("Empty username: No exception thrown");
@@ -252,15 +253,18 @@ class SenderTest extends TestCase
         try {
             $this->instance->public_make_json_mt("", "", "", array());
             $this->fail("Empty parameter: No exception thrown");
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         try {
             $this->instance->public_make_json_mt($id, "", "", array());
             $this->fail("Empty parameter: No exception thrown");
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         try {
             $this->instance->public_make_json_mt($id, $dst, "", array());
             $this->fail("Empty parameter: No exception thrown");
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
 
         $this->assertEquals(
             $this->instance->public_make_json_mt($id, $dst, $txt),
@@ -284,9 +288,9 @@ class SenderTest extends TestCase
         
 
         $GMTDiff = date("O");
-        if(intval($GMTDiff) >= 0){
+        if (intval($GMTDiff) >= 0) {
             $expectedSchedule = $options_schedule['schedule'] . str_replace("+", "-", $GMTDiff);
-        }else{
+        } else {
             $expectedSchedule = $options_schedule['schedule'] . str_replace("-", "+", $GMTDiff);
         }
         $this->assertEquals(
@@ -318,35 +322,43 @@ class SenderTest extends TestCase
         try {
             $this->instance->public_make_json_mmt("", "", "", "", array());
             $this->fail("Empty parameter: No exception thrown");
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         try {
             $this->instance->public_make_json_mmt($id, "", "", "", array());
             $this->fail("Empty parameter: No exception thrown");
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         try {
             $this->instance->public_make_json_mmt($id, $dst, "", "", array());
             $this->fail("Empty parameter: No exception thrown");
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         try {
             $this->instance->public_make_json_mmt($id, $dst, $txt, "", array());
             $this->fail("Empty parameter: No exception thrown");
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         try {
             $this->instance->public_make_json_mmt($id, $dst, $txt, $subject, array());
             $this->fail("Empty parameter: No exception thrown");
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         try {
             $this->instance->public_make_json_mmt($id, $dst, $txt, $subject, "Invalid attachment");
             $this->fail("Invalid attachment: No exception thrown");
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         try {
             $this->instance->public_make_json_mmt($id, $dst, array("Invalid Text"), $subject, $attachment);
             $this->fail("Invalid text: No exception thrown");
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         try {
             $this->instance->public_make_json_mmt($id, $dst, $txt, array("Invalid Subject"), $attachment);
             $this->fail("Invalid subject: No exception thrown");
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+        }
         
         // Valid
         $this->assertEquals(
@@ -812,8 +824,8 @@ class SenderTest extends TestCase
         $this->instance->public_response_parser("Invalid JSON Response");
     }
 
-    public function test_response_parser_status(){
-
+    public function test_response_parser_status()
+    {
         $this->assertEquals(
             $this->instance->public_response_parser_status('mt', 1, '{"status":"Success","code":200,"request":"test","messages":[{"state":"P"}]}'),
             "P"

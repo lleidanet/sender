@@ -653,7 +653,8 @@ class Sender
         }
     }
 
-    protected function protect_json($json){
+    protected function protect_json($json)
+    {
         return str_replace($this->password, "censored password", $json);
     }
 
@@ -710,7 +711,7 @@ class Sender
                 $state = $result->messages[0]->state;
             }
             $this->set_error(false);
-        }else{
+        } else {
             $this->set_error($result->status, $result->code);
         }
 
