@@ -13,6 +13,7 @@
         "registered",
         "lnst"
     ],
+    "test": "vendor/bin/phpunit",
     "autoload": {
         "psr-4": {
             "lnst\\": "src/"
