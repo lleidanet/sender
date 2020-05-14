@@ -1,4 +1,4 @@
-name: PHP LNST Sender
+name: Build
 
 on:
   push:
