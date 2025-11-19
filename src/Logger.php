@@ -3,7 +3,7 @@
  * Logger.php
  * API PHP v4
  * @author David Tapia (c) 2018 - Lleida.net
- * @version 4.0
+ * @version 4.1.0
  *
  */
 namespace lnst;
@@ -29,7 +29,7 @@ class Logger extends AbstractLogger
             } else {
                 $this->filename = $filename;
             }
-            
+
             $this->stream = fopen($this->filename, 'a+');
             $this->isStream = 1;
 
