@@ -22,7 +22,7 @@ const MAX_LENGTH_PREMIUM_NUMBERS = 5;
 class Sender
 {
     private $user;
-    private $password;
+    private $apikey;
     private $lang;
 
     public $error;
@@ -60,18 +60,17 @@ class Sender
         'D', 'T'
     );
 
-    // $sender = new Sender($user, $pass);
-    public function __construct($user, $password, $lang = 'EN')
+    public function __construct($user, $apikey, $lang = 'EN')
     {
         if (empty($user)) {
             throw new \InvalidArgumentException("Empty user!");
         }
-        if (empty($password)) {
-            throw new \InvalidArgumentException("Empty password!");
+        if (empty($apikey)) {
+            throw new \InvalidArgumentException("Empty apikey!");
         }
 
         $this->user = $user;
-        $this->password = $password;
+        $this->apikey = $apikey;
 
         // Registered lang
         $this->setLang($lang);
@@ -242,7 +241,6 @@ class Sender
         }
 
         $options['user'] = $this->user;
-        $options['password'] = $this->password;
         $options['user_id'] = $id;
         $options['dst'] = $this->make_dst($dst);
 
@@ -255,7 +253,6 @@ class Sender
     {
         $options = array();
         $options['user'] = $this->user;
-        $options['password'] = $this->password;
         $options['user_id'] = $id;
         $options['request'] = $request;
         return json_encode($options);
@@ -537,14 +534,14 @@ class Sender
 
     protected function protect_json($json)
     {
-        return str_replace($this->password, "censored password", $json);
+        return str_replace($this->apikey, "censored apikey", $json);
     }
 
     protected function do_request($service, $json)
     {
         $http_options = array('http' => array(
             'method'  => 'POST',
-            'header'  => array('Content-type: application/json', 'Accept: application/json'),
+            'header'  => array('Content-type: application/json', 'Accept: application/json', 'Authorization: x-api-key '.$apikey),
             'timeout' => 30,
             'content' => $json
         ));

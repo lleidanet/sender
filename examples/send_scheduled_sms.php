@@ -5,18 +5,18 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 require_once __DIR__ . '/config.php';
 
 try {
-    $sender = new Sender(USER, PASS);
+    $sender = new Sender(USER, APIKEY);
     $sender->setLogger('sender.log');
-    
+
     $id = rand();
     $dst = RECIPIENT;
     $timestamp = time();
     $schedule = $timestamp + 60*5; //send it within 5 mins
     $text = 'Scheduled SMS at '. date('YmdHi', $timestamp).' to be sent at '. date('YmdHi', $schedule);
     $options = array('schedule' => date('YmdHi', $schedule));
-    
+
     $queued = $sender->scheduledSMS($id, $dst, $text, $options);
-    
+
     if ($sender->errno) {
         echo "Error: ". $sender->errno . ":" . $sender->error . PHP_EOL;
     }

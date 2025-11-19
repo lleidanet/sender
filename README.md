@@ -1,5 +1,4 @@
-# LLeidaNet PHP API
-
+# Lleida.net PHP API
 
 [![Actions Status](https://github.com/lleidanet/sender/workflows/Build/badge.svg)](https://github.com/lleidanet/sender/actions)
 [![PHP Version](https://img.shields.io/badge/PHP-%3E%3D%205.6-blue)](https://api.lleida.net/php/v4/es/)

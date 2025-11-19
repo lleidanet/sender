@@ -5,16 +5,16 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 require_once __DIR__ . '/config.php';
 
 try {
-    $sender = new Sender(USER, PASS);
+    $sender = new Sender(USER, APIKEY);
     $sender->setLogger('sender.log');
-    
+
     $id = rand();
     $dst = RECIPIENT;
     $text = 'Unicode SMS sent at '. date('YmdHi', time()).' àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞŸ €';
     $options = array('unicode' => '1');
-    
+
     $queued = $sender->sms($id, $dst, $text, $options);
-    
+
     if ($sender->errno) {
         echo "Error: ". $sender->errno . ":" . $sender->error . PHP_EOL;
     }

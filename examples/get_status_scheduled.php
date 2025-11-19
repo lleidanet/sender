@@ -20,7 +20,7 @@ if (php_sapi_name() == "cli") {
 
 
 try {
-    $sender = new Sender(USER, PASS);
+    $sender = new Sender(USER, APIKEY);
     $sender->setLogger('sender.log');
     $status = $sender->getStatusScheduled($id);
 

@@ -113,18 +113,18 @@ class SenderExt extends Sender
 class SenderTest extends TestCase
 {
     protected static $username;
-    protected static $password;
+    protected static $apikey;
     protected $instance;
 
     public static function setUpBeforeClass()
     {
         self::$username = "username";
-        self::$password = "password";
+        self::$apikey = "apikey";
     }
 
     protected function setUp()
     {
-        $this->instance = new SenderExt(self::$username, self::$password);
+        $this->instance = new SenderExt(self::$username, self::$apikey);
         $this->instance->setLogger("tests.log");
     }
 
@@ -132,14 +132,14 @@ class SenderTest extends TestCase
     public function test_constructor()
     {
         try {
-            new SenderExt("", self::$password);
+            new SenderExt("", self::$apikey);
             $this->fail("Empty username: No exception thrown");
         } catch (\Exception $e) {
         }
 
         try {
             new SenderExt(self::$username, "");
-            $this->fail("Empty password: No exception thrown");
+            $this->fail("Empty apikey: No exception thrown");
         } catch (\Exception $e) {
         }
     }
@@ -232,22 +232,22 @@ class SenderTest extends TestCase
 
         $this->assertEquals(
             $this->instance->public_make_json_mt($id, $dst, $txt),
-            '{"sms":{"user":"username","password":"password","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"VGVzdCBtZXNzYWdl","encoding":"base64","charset":"iso-8859-1"}}'
+            '{"sms":{"user":"username","apikey":"apikey","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"VGVzdCBtZXNzYWdl","encoding":"base64","charset":"iso-8859-1"}}'
         );
 
         $this->assertEquals(
             $this->instance->public_make_json_mt($id, $dst, $txt, $options),
-            '{"sms":{"delivery_receipt":{"lang":"EN","email":"test@domain.com","cert_type":"D"},"allow_answer":"1","user":"username","password":"password","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"VGVzdCBtZXNzYWdl","encoding":"base64","charset":"iso-8859-1"}}'
+            '{"sms":{"delivery_receipt":{"lang":"EN","email":"test@domain.com","cert_type":"D"},"allow_answer":"1","user":"username","apikey":"apikey","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"VGVzdCBtZXNzYWdl","encoding":"base64","charset":"iso-8859-1"}}'
         );
 
         $this->assertEquals(
             $this->instance->public_make_json_mt($id, $dst, $txt, $options_src),
-            '{"sms":{"src":"Sender","delivery_receipt":{"lang":"EN","email":"test@domain.com","cert_type":"D"},"user":"username","password":"password","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"VGVzdCBtZXNzYWdl","encoding":"base64","charset":"iso-8859-1"}}'
+            '{"sms":{"src":"Sender","delivery_receipt":{"lang":"EN","email":"test@domain.com","cert_type":"D"},"user":"username","apikey":"apikey","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"VGVzdCBtZXNzYWdl","encoding":"base64","charset":"iso-8859-1"}}'
         );
 
         $this->assertEquals(
             $this->instance->public_make_json_mt($id, $dst, $txt, $options_unicode),
-            '{"sms":{"unicode":true,"delivery_receipt":{"lang":"EN","email":"test@domain.com","cert_type":"D"},"allow_answer":"1","user":"username","password":"password","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"AFQAZQBzAHQAIABtAGUAcwBzAGEAZwBl","encoding":"base64","charset":"UTF-16","data_coding":"unicode"}}'
+            '{"sms":{"unicode":true,"delivery_receipt":{"lang":"EN","email":"test@domain.com","cert_type":"D"},"allow_answer":"1","user":"username","apikey":"apikey","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"AFQAZQBzAHQAIABtAGUAcwBzAGEAZwBl","encoding":"base64","charset":"UTF-16","data_coding":"unicode"}}'
         );
 
 
@@ -259,7 +259,7 @@ class SenderTest extends TestCase
         }
         $this->assertEquals(
             $this->instance->public_make_json_mt($id, $dst, $txt, $options_schedule),
-            '{"sms":{"schedule":"'. $expectedSchedule .'","unicode":true,"delivery_receipt":{"lang":"EN","email":"test@domain.com","cert_type":"D"},"allow_answer":"1","user":"username","password":"password","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"AFQAZQBzAHQAIABtAGUAcwBzAGEAZwBl","encoding":"base64","charset":"UTF-16","data_coding":"unicode"}}'
+            '{"sms":{"schedule":"'. $expectedSchedule .'","unicode":true,"delivery_receipt":{"lang":"EN","email":"test@domain.com","cert_type":"D"},"allow_answer":"1","user":"username","apikey":"apikey","user_id":'. $id .',"dst":{"num":["+34666666666"]},"txt":"AFQAZQBzAHQAIABtAGUAcwBzAGEAZwBl","encoding":"base64","charset":"UTF-16","data_coding":"unicode"}}'
         );
     }
 
@@ -268,7 +268,7 @@ class SenderTest extends TestCase
     {
         $this->assertEquals(
             $this->instance->public_make_json_status("mt", "1234"),
-            "{\"user\":\"". self::$username ."\",\"password\":\"". self::$password ."\",\"user_id\":\"1234\",\"request\":\"mt\"}"
+            "{\"user\":\"". self::$username ."\",\"apikey\":\"". self::$apikey ."\",\"user_id\":\"1234\",\"request\":\"mt\"}"
         );
     }
 

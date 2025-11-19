@@ -3,7 +3,7 @@
  * config.php
  * Setting test variables
  * @author David Tapia (c) 2018 - Lleida.net
- * @version 4.0
+ * @version 4.1.0
  */
 
 /***************************************
@@ -26,7 +26,7 @@ set_time_limit(0);
 ob_implicit_flush();
 
 define("USER", "");
-define("PASS", "");
+define("APIKEY", "");
 define("RECIPIENT", "+34...");
 
 /* no cli compatibility  */
