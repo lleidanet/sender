@@ -5,9 +5,9 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 require_once __DIR__ . '/config.php';
 
 try {
-    $sender = new Sender(USER, PASS);
+    $sender = new Sender(USER, APIKEY);
     $sender->setLogger('sender.log');
-    
+
     $id = rand();
     $dst = RECIPIENT;
     $text = 'Registered SMS now: '. date('YmdHi', time());
@@ -16,9 +16,9 @@ try {
         'cert_type' => 'D',
         'email' => 'INTERNALID'
     ));
-    
+
     $queued = $sender->registeredSMS($id, $dst, $text, $options);
-    
+
     if ($sender->errno) {
         echo "Error: ". $sender->errno . ":" . $sender->error . PHP_EOL;
     }

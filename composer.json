@@ -1,12 +1,11 @@
 {
     "name": "lnst/sender",
     "description": "Lleida.net resources",
-    "version": "4.0.1",
+    "version": "5.0.0",
     "type": "library",
     "keywords": [
         "lleidanet",
         "sms",
-        "mms",
         "send",
         "messages",
         "registered",
@@ -15,7 +14,7 @@
     "homepage": "https://api.lleida.net/",
     "authors": [
         {
-            "name": "David Tapia",
+            "name": "David Tàpia",
             "email": "dtapia@lleida.net",
             "homepage": "https://www.lleida.net/"
         },{

@@ -3,7 +3,7 @@
  * Sender.php
  * API PHP v4
  * @author David Tapia (c) 2018 - Lleida.net
- * @version 4.0
+ * @version 5.0.0
  *
  */
 
@@ -15,7 +15,6 @@ use lnst\Logger;
 const HOST = 'https://api.lleida.net/';
 
 const SERVICE_SMS = HOST.'sms/v2/';
-const SERVICE_MMS = HOST.'mms/v2/';
 const SERVICE_MSG = HOST.'messages/v3/';
 
 const MAX_LENGTH_PREMIUM_NUMBERS = 5;
@@ -23,7 +22,7 @@ const MAX_LENGTH_PREMIUM_NUMBERS = 5;
 class Sender
 {
     private $user;
-    private $password;
+    private $apikey;
     private $lang;
 
     public $error;
@@ -61,18 +60,17 @@ class Sender
         'D', 'T'
     );
 
-    // $sender = new Sender($user, $pass);
-    public function __construct($user, $password, $lang = 'EN')
+    public function __construct($user, $apikey, $lang = 'EN')
     {
         if (empty($user)) {
             throw new \InvalidArgumentException("Empty user!");
         }
-        if (empty($password)) {
-            throw new \InvalidArgumentException("Empty password!");
+        if (empty($apikey)) {
+            throw new \InvalidArgumentException("Empty apikey!");
         }
-        
+
         $this->user = $user;
-        $this->password = $password;
+        $this->apikey = $apikey;
 
         // Registered lang
         $this->setLang($lang);
@@ -135,20 +133,6 @@ class Sender
         return $this->response_parser($this->do_request(SERVICE_SMS, urlencode($json)));
     }
 
-    // mmt alias
-    public function mms($id, $dst, $text, $subject, $attachment, $options = array())
-    {
-        return $this->mmt($id, $dst, $text, $subject, $attachment, $options);
-    }
-
-    // $queued = $sender->mmt($id, $dst, $text, $subject, $attachment, $options='');
-    public function mmt($id, $dst, $text, $subject, $attachment, $options = array())
-    {
-        $json = $this->make_json_mmt($id, $dst, $text, $subject, $attachment, $options);
-        $this->logger->debug('json: '. $this->protect_json($json) ."\n");
-        return $this->response_parser($this->do_request(SERVICE_MMS, urlencode($json)));
-    }
-
     /************************************
      * Get status of a message request  *
      *                                  *
@@ -158,13 +142,6 @@ class Sender
         $json = $this->make_json_status('mt', $id);
         $this->logger->debug('json: '. $this->protect_json($json) ."\n");
         return $this->response_parser_status('mt', $id, $this->do_request(SERVICE_MSG, urlencode($json)));
-    }
-
-    public function getStatusMMS($id)
-    {
-        $json = $this->make_json_status('mmt', $id);
-        $this->logger->debug('json: '. $this->protect_json($json) ."\n");
-        return $this->response_parser_status('mmt', $id, $this->do_request(SERVICE_MSG, urlencode($json)));
     }
 
     // $status = $sender->getStatusScheduled($id);
@@ -264,7 +241,6 @@ class Sender
         }
 
         $options['user'] = $this->user;
-        $options['password'] = $this->password;
         $options['user_id'] = $id;
         $options['dst'] = $this->make_dst($dst);
 
@@ -273,64 +249,10 @@ class Sender
         return json_encode(array('sms' => $options));
     }
 
-    // Return json mms object
-    // Throw InvalidArgumentException
-    protected function make_json_mmt($id, $dst, $text, $subject, $attachment, $options = array())
-    {
-        if (empty($id)) {
-            throw new \InvalidArgumentException("Empty user_id!");
-        }
-
-        if (empty($dst)) {
-            throw new \InvalidArgumentException("Empty recipient!");
-        }
-
-        if (empty($text)) {
-            throw new \InvalidArgumentException("Empty text!");
-        }
-
-        if (empty($subject)) {
-            throw new \InvalidArgumentException("Empty subject!");
-        }
-
-        if (empty($attachment)) {
-            throw new \InvalidArgumentException("Empty attachment!");
-        } elseif (!is_array($attachment)) {
-            throw new \InvalidArgumentException("Invalid attachment format!");
-        } else {
-            // Throw an error if invalid format
-            $this->check_attachment($attachment);
-        }
-
-        if (!empty($options)) {
-            $this->check_options($options);
-        }
-
-        if (!is_string($text)) {
-            throw new \InvalidArgumentException("Unknown text format!");
-        }
-
-        if (!is_string($subject)) {
-            throw new \InvalidArgumentException("Unknown subject format!");
-        }
-
-        $options = array_merge($options, $this->make_text($text, $options));
-
-        $options['user'] = $this->user;
-        $options['password'] = $this->password;
-        $options['user_id'] = $id;
-        $options['dst'] = $this->make_dst($dst);
-        $options['subject'] = $subject;
-        $options['attachment'] = $attachment;
-
-        return json_encode(array('mms' => $options));
-    }
-
     protected function make_json_status($request, $id)
     {
         $options = array();
         $options['user'] = $this->user;
-        $options['password'] = $this->password;
         $options['user_id'] = $id;
         $options['request'] = $request;
         return json_encode($options);
@@ -424,49 +346,6 @@ class Sender
         }
     }
 
-    /*
-    "attachment":{
-        "mime":"image/jpeg",
-        "content":"CmFzZgphc2QKYXNkZgphc2RmCmFzZApmYQpzZGY="
-    }
-    */
-    protected function check_attachment($attachment)
-    {
-        if (is_array($attachment)) {
-            if (!array_key_exists('mime', $attachment)) {
-                throw new \InvalidArgumentException("Invalid attachment format, unknown mimetype!");
-            } else {
-                // Supported MMS content types MMS may include the following content formats:
-                switch ($attachment['mime']) {
-                    case "image/gif":
-                    case "image/png":
-                    case "image/jpeg":
-                    case "audio/amr":
-                    case "audio/x-wav":
-                    case "audio/mpeg":
-                    case "audio/midi":
-                    case "video/3gpp":
-                    case "video/mpeg":
-                        break;
-                    default:
-                        throw new \InvalidArgumentException("Invalid mimetype!");
-                }
-            }
-
-            if (!array_key_exists('content', $attachment)) {
-                throw new \InvalidArgumentException("Invalid attachment format, unknown content!");
-            } else {
-                if (empty($attachment['content'])) {
-                    throw new \InvalidArgumentException("Empty attachment content!");
-                } elseif (!$this->isBase64Encoded($attachment['content'])) {
-                    throw new \InvalidArgumentException("Invalid attachment format, unknown content format!");
-                }
-            }
-        } else {
-            throw new \InvalidArgumentException("Invalid attachment format!");
-        }
-    }
-
     protected function isBase64Encoded($data)
     {
         if (strlen($data) < 15) {
@@ -552,13 +431,13 @@ class Sender
         if (strlen($prefix) == 0) {
             return false;
         }
-        
+
         if ($prefix[0] == "+" || $prefix[0] == " ") {
             $prefix = substr($prefix, 1);
         } elseif (substr($prefix, 0, 2) == "00") {
             $prefix = substr($prefix, 2);
         }
-        
+
         if (strlen($prefix) != 0 && is_numeric($prefix)) {
             return $prefix;
         }
@@ -655,14 +534,14 @@ class Sender
 
     protected function protect_json($json)
     {
-        return str_replace($this->password, "censored password", $json);
+        return str_replace($this->apikey, "censored apikey", $json);
     }
 
     protected function do_request($service, $json)
     {
         $http_options = array('http' => array(
             'method'  => 'POST',
-            'header'  => array('Content-type: application/json', 'Accept: application/json'),
+            'header'  => array('Content-type: application/json', 'Accept: application/json', 'Authorization: x-api-key '.$apikey),
             'timeout' => 30,
             'content' => $json
         ));
