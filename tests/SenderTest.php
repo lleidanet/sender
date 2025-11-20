@@ -3,7 +3,7 @@
  * SenderTest.php
  * API PHP v4
  * @author Javier Sanahuja <jsanahuja@lleida.net>
- * @version 4.1.0
+ * @version 5.0.0
  *
  */
 

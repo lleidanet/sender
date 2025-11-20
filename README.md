@@ -1,10 +1,10 @@
 # Lleida.net PHP API
 
 [![Actions Status](https://github.com/lleidanet/sender/workflows/Build/badge.svg)](https://github.com/lleidanet/sender/actions)
-[![PHP Version](https://img.shields.io/badge/PHP-%3E%3D%205.6-blue)](https://api.lleida.net/php/v4/es/)
+[![PHP Version](https://img.shields.io/badge/PHP-%3E%3D%205.6-blue)](https://api.lleida.net/php/)
 
 A PHP implementation of our [Send SMS](https://api.lleida.net/dtd/sms/v2/en/index.html) and [Messages SMS](https://api.lleida.net/dtd/messages/v3/en/index.html) HTTP APIs.
 
 ## Documentation
 
-* [English](https://api.lleida.net/php/v4/en/)
+* [English](https://api.lleida.net/php/)

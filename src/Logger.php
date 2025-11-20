@@ -3,7 +3,7 @@
  * Logger.php
  * API PHP v4
  * @author David Tapia (c) 2018 - Lleida.net
- * @version 4.1.0
+ * @version 5.0.0
  *
  */
 namespace lnst;

@@ -3,7 +3,7 @@
  * config.php
  * Setting test variables
  * @author David Tapia (c) 2018 - Lleida.net
- * @version 4.1.0
+ * @version 5.0.0
  */
 
 /***************************************
