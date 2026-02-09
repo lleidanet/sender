@@ -38,7 +38,7 @@ class Logger extends AbstractLogger
             $this->user = $this->getuser();
 
             $this->objID = $this->getObjectID(32);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->stream = STDERR;
         }
     }

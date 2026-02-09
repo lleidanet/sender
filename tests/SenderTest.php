@@ -46,11 +46,6 @@ class SenderExt extends Sender
         return $this->check_options($options);
     }
 
-    public function public_check_attachment($attachment)
-    {
-        return $this->check_attachment($attachment);
-    }
-
     public function public_isBase64Encoded($data)
     {
         return $this->isBase64Encoded($data);
@@ -112,17 +107,11 @@ class SenderExt extends Sender
  */
 class SenderTest extends TestCase
 {
-    protected static $username;
-    protected static $apikey;
+    protected static $username = "username";
+    protected static $apikey = "apikey";
     protected $instance;
 
-    public static function setUpBeforeClass()
-    {
-        self::$username = "username";
-        self::$apikey = "apikey";
-    }
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->instance = new SenderExt(self::$username, self::$apikey);
         $this->instance->setLogger("tests.log");
@@ -135,12 +124,14 @@ class SenderTest extends TestCase
             new SenderExt("", self::$apikey);
             $this->fail("Empty username: No exception thrown");
         } catch (\Exception $e) {
+            $this->assertEquals('Empty user!', $e->getMessage());
         }
 
         try {
             new SenderExt(self::$username, "");
             $this->fail("Empty apikey: No exception thrown");
         } catch (\Exception $e) {
+            $this->assertEquals('Empty apikey!', $e->getMessage());
         }
     }
 
@@ -162,12 +153,14 @@ class SenderTest extends TestCase
             $this->instance->getStatusCode("invalidStatusKey");
             $this->fail("Invalid status: No exception thrown");
         } catch (\Exception $e) {
+            $this->assertEquals('Undefined status value: invalidStatusKey', $e->getMessage());
         }
 
         try {
-            $this->instance->getStatusDescription("invalidStatusKey");
+            $this->instance->getStatusDescription("invalidStatusKey2");
             $this->fail("Invalid status: No exception thrown");
         } catch (\Exception $e) {
+            $this->assertEquals('Undefined status value: invalidStatusKey2', $e->getMessage());
         }
     }
 
@@ -218,16 +211,19 @@ class SenderTest extends TestCase
             $this->instance->public_make_json_mt("", "", "", array());
             $this->fail("Empty parameter: No exception thrown");
         } catch (\Exception $e) {
+            $this->assertEquals('Empty user_id!', $e->getMessage());
         }
         try {
             $this->instance->public_make_json_mt($id, "", "", array());
             $this->fail("Empty parameter: No exception thrown");
         } catch (\Exception $e) {
+            $this->assertEquals('Empty recipient!', $e->getMessage());
         }
         try {
             $this->instance->public_make_json_mt($id, $dst, "", array());
             $this->fail("Empty parameter: No exception thrown");
         } catch (\Exception $e) {
+            $this->assertEquals('Empty text!', $e->getMessage());
         }
 
         $this->assertEquals(
@@ -298,6 +294,7 @@ class SenderTest extends TestCase
             $this->instance->public_make_dst(array());
             $this->fail("Empty dst: No exception thrown");
         } catch (\Exception $e) {
+            $this->assertEquals('Empty recipient!', $e->getMessage());
         }
 
         $this->expectException(\Exception::class);
@@ -369,6 +366,7 @@ class SenderTest extends TestCase
             $this->instance->public_check_options($options);
             $this->fail("Invalid lang: No exception thrown");
         } catch (\Exception $e) {
+            $this->assertEquals('Invalid lang!', $e->getMessage());
         }
 
         // Invalid cert_type
@@ -381,6 +379,7 @@ class SenderTest extends TestCase
             $this->instance->public_check_options($options);
             $this->fail("Invalid cert_type: No exception thrown");
         } catch (\Exception $e) {
+            $this->assertEquals('Invalid registered type!', $e->getMessage());
         }
 
         // Valid data
@@ -424,6 +423,7 @@ class SenderTest extends TestCase
                     $this->instance->public_check_registered_type($rtype."-");
                     $this->fail("Invalid cert_type: No exception thrown");
                 } catch (\Exception $e) {
+                    $this->assertEquals('Invalid registered type!', $e->getMessage());
                 }
             }
         }
@@ -447,6 +447,7 @@ class SenderTest extends TestCase
                     $this->instance->public_check_lang(strrev($lang));
                     $this->fail("Invalid lang: No exception thrown");
                 } catch (\Exception $e) {
+                    $this->assertEquals('Invalid lang!', $e->getMessage());
                 }
             }
         }
@@ -513,6 +514,7 @@ class SenderTest extends TestCase
             $this->instance->public_check_schedule(time());
             $this->fail("Invalid schedule: No exception thrown");
         } catch (\Exception $e) {
+            $this->assertEquals('Unknown schedule format!', $e->getMessage());
         }
 
         // Invalid date format
@@ -520,6 +522,7 @@ class SenderTest extends TestCase
             $this->instance->public_check_schedule(date("Ymdhiss", time()));
             $this->fail("Invalid schedule: No exception thrown");
         } catch (\Exception $e) {
+            $this->assertEquals('Invalid schedule format', $e->getMessage());
         }
 
         // Invalid format
@@ -527,6 +530,7 @@ class SenderTest extends TestCase
             $this->instance->public_check_schedule("Invalid format");
             $this->fail("Invalid schedule: No exception thrown");
         } catch (\Exception $e) {
+            $this->assertEquals('Invalid schedule format', $e->getMessage());
         }
     }
 
