@@ -57,27 +57,27 @@ class Logger extends AbstractLogger
         $this->stream = $stream;
     }
 
-    public function log($level, $message, array $context = [])
+    public function log($level, string|\Stringable $message, array $context = []): void
     {
         fwrite($this->stream, strtr(date('r').' '.$this->host.' sender['.$this->pid.']: ('.$this->user.') '.$this->objID.' '.$message, $context));
     }
 
-    public function debug($message, array $context = [])
+    public function debug(string|\Stringable $message, array $context = []): void
     {
         $this->log(LogLevel::DEBUG, strtr($message, $context));
     }
 
-    public function error($message, array $context = [])
+    public function error(string|\Stringable $message, array $context = []): void
     {
         $this->log(LogLevel::ERROR, strtr($message, $context));
     }
 
-    public function info($message, array $context = [])
+    public function info(string|\Stringable $message, array $context = []): void
     {
         $this->log(LogLevel::INFO, strtr($message, $context));
     }
 
-    public function warning($message, array $context = [])
+    public function warning(string|\Stringable $message, array $context = []): void
     {
         $this->log(LogLevel::WARNING, strtr($message, $context));
     }
