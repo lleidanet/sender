@@ -405,7 +405,7 @@ class Sender
             } else {
                 $schedule = str_replace("-", "+", $schedule);
             }
-        } elseif (preg_match('#[0-9]{12}#', $schedule)) {
+        } elseif (preg_match('#^[0-9]{12}$#', $schedule)) {
             // Transform the dateTime to UTC [+-] HHMM
             $utc = date('O'); // system UTC
             if (intval($utc) >= 0) {
@@ -541,7 +541,7 @@ class Sender
     {
         $http_options = array('http' => array(
             'method'  => 'POST',
-            'header'  => array('Content-type: application/json', 'Accept: application/json', 'Authorization: x-api-key '.$apikey),
+            'header'  => array('Content-type: application/json', 'Accept: application/json', 'Authorization: x-api-key ' . $this->apikey),
             'timeout' => 30,
             'content' => $json
         ));
